@@ -1,0 +1,30 @@
+{
+  "name": "eloquent-form-builder",
+  "version": "1.0.0",
+  "description": "A transparent, es6 class based form builder designed to work out of the box with Laravel's Eloquent Forms framework. A dev can easily go into the individual classes and add or customize functionality to best fit their backend functionality",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/booellean/eloquent-form-builder.git"
+  },
+  "keywords": [
+    "form",
+    "builder",
+    "form",
+    "builder",
+    "drag",
+    "and",
+    "drop",
+    "transparent"
+  ],
+  "author": "Elle (booellean)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/booellean/eloquent-form-builder/issues"
+  },
+  "homepage": "https://github.com/booellean/eloquent-form-builder#readme"
+}
