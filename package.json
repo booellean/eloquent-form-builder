@@ -31,10 +31,22 @@
   },
   "homepage": "https://github.com/booellean/eloquent-form-builder#readme",
   "devDependencies": {
+    "autoprefixer": "^9.7.3",
+    "css-loader": "^3.2.1",
+    "extract-loader": "^3.1.0",
+    "file-loader": "^5.0.2",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.8.0",
+    "node-sass": "^4.13.0",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.1",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.2",
+    "typings-for-css-modules-loader": "^1.7.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0"
-  }
+  },
+  "dependencies": {}
 }

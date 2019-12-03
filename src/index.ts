@@ -1,31 +1,47 @@
 import { defaultOptions } from './defaultOpts';
-// import input from './components/input';
+const Styles = require('./styles.scss');
 
 export class FormBuilder {
     private base: HTMLElement;
     private wrapper: HTMLElement;
     private list: HTMLElement;
+    private dragEl: string;
+    protected formData: Array<object>;
 
     constructor(element: string, options: Array<object> = defaultOptions){
         // TODO: if there is no element passed, then the application will not work....
         // There must be a better way to clear this check and alert a user if this isn't instantiating
         this.base = document.getElementById(element) || document.createElement('div');
-        console.log("I've started");
+        this.base.classList.add('form-wrapper');
         this.wrapper = document.createElement('ul');
+        this.formData = [];
+        this.dragEl = 'no selection';
+
         this.wrapper.id = 'form-build';
 
         this.list = document.createElement('ul');
         this.list.id = 'form-options';
 
-        defaultOptions.forEach( item => {
+        defaultOptions.forEach( (item, index) => {
             const li = document.createElement('li');
-            li.innerHTML = item.type;
+            li.innerHTML = item.name;
+            li.id = index.toString();
+            li.setAttribute('draggable', 'true');
+
+            // Add event listeners for list item... creates drag and drop functionality and creating new form block
             li.addEventListener('click', () => this.createNewFormElement(item));
+
+            li.addEventListener('dragstart', (e: DragEvent) => this.onDragStart(li, item, e), false);
+            li.addEventListener('dragenter', (e: DragEvent) => this.onDragEnter(li, item, e), false);
+            li.addEventListener('dragover', (e: DragEvent) => this.onDragOver(li, item, e), false);
+            li.addEventListener('dragleave', (e: DragEvent) => this.onDragLeave(li, item, e), false);
+            li.addEventListener('drop', (e: DragEvent) => this.onDrop(li, item, e), false);
+            li.addEventListener('dragend', (e: DragEvent) => this.onDragEnd(li, item, e), false);
             this.list.append(li);
         });
 
-        this.base.append(this.wrapper);
         this.base.append(this.list);
+        this.base.append(this.wrapper);
     }
 
     // TODO: build on methods
@@ -45,6 +61,71 @@ export class FormBuilder {
 
         console.log(newInstance);
     }
+
+    // Drag and Drop Events
+    /**
+     * Code Partially derived from Shayna Lekohmaher
+     * https://codepen.io/lorelea/pen/WRqQyy
+     * Visited 12/2/2019
+     */
+
+    onDragStart(el: HTMLElement, data: object, e: DragEvent){
+        const t = e.dataTransfer;
+        this.dragEl = el.id;
+        el.classList.add('drag-moving'); // muted colors, this is moving
+        if(t){
+            t.effectAllowed = 'move';
+            t.setData('text/html', el.innerHTML);
+        }
+    }
+
+    onDragEnter(el: HTMLElement, data: object, e: DragEvent){
+        el.classList.add('drag-hover'); // highlighted colors. This may be moved
+        e.preventDefault();
+    }
+
+    onDragOver(el: HTMLElement, data: object, e: DragEvent){
+        const t = e.dataTransfer;
+        e.preventDefault();
+        if (e.stopPropagation){
+            e.stopPropagation();
+        }
+        if(t){
+            t.dropEffect = 'move';
+            return false;
+        }
+    }
+
+    onDragLeave(el: HTMLElement, data: object, e: DragEvent){
+        el.classList.remove('drag-hover');
+    }
+
+    onDrop(el: HTMLElement, data: object, e: DragEvent){
+        const t = e.dataTransfer;
+        let current = document.getElementById(this.dragEl);
+        if (e.stopPropagation){
+            e.stopPropagation();
+        }
+        if(current){
+            // This checks if the dropping node is before the node being dropped on
+            // if so, it will replace the position
+            // Otherwise it will pop after
+            // This is a human ui thing... If you are dragging a node up, you expect it to drop in after, not before
+            if(current.compareDocumentPosition(el) === 2){
+                this.list.insertBefore(current, el);
+            }else{
+                this.list.insertBefore(current, el.nextSibling);
+            }
+            console.log(el.innerHTML + ' Was dropped on. ' + current.innerHTML + " is being dropped" );
+
+        }
+        this.dragEl = 'no selection';
+    }
+
+    onDragEnd(el: HTMLElement, data: object, e: DragEvent){
+        el.classList.remove('drag-moving');
+    }
+
     // Add field
 
     // Remove field

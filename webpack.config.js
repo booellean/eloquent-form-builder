@@ -1,29 +1,59 @@
 const path = require('path');
-const { resolve } = require('path')
+const autoprefixer = require('autoprefixer');
 
 module.exports = {
   context: __dirname,
+//   entry: ['./src/index.ts', './src/styles.scss'],
   entry: './src/index.ts',
+  resolve: {
+    modules: [path.resolve(__dirname, 'dist'), 'node_modules'],
+    extensions: [ '.tsx', '.ts', '.js', '.scss', '.css' ],
+  },
+  output: {
+    filename: 'index.js',
+    path: path.resolve(__dirname, 'dist'),
+    library: 'ef',
+    libraryTarget: 'umd'
+  },
+  devtool: "source-map",
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
+        test: /\.ts$/,
+        use: {
+            loader: 'ts-loader',
+            options: {
+                transpileOnly: true
+            }
+        },
         exclude: /node_modules/,
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: [
+                autoprefixer(),
+              ],
+            },
+          },
+          {
+            loader: 'sass-loader',
+          },
+        ],
       },
     ],
   },
   optimization: {
     minimize: false
-  },
-  resolve: {
-    modules: [resolve(__dirname, 'dist'), 'node_modules'],
-    extensions: [ '.tsx', '.ts', '.js' ],
-  },
-  output: {
-    filename: 'index.js',
-    path: path.resolve(__dirname, 'dist'),
-    library: 'ef'
   },
   devServer: {
     contentBase: ['demo'],
