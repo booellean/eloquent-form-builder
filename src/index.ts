@@ -40,6 +40,9 @@ export class FormBuilder {
             this.list.append(li);
         });
 
+        this.wrapper.addEventListener('dragover', (e: DragEvent) => this.onDragOver(this.wrapper, {}, e), false);
+        this.wrapper.addEventListener('drop', (e: DragEvent) => this.onDrop(this.wrapper, {}, e), false);
+
         this.base.append(this.list);
         this.base.append(this.wrapper);
     }
@@ -102,22 +105,30 @@ export class FormBuilder {
 
     onDrop(el: HTMLElement, data: object, e: DragEvent){
         const t = e.dataTransfer;
+        console.log(el);
         let current = document.getElementById(this.dragEl);
         if (e.stopPropagation){
             e.stopPropagation();
         }
         if(current){
-            // This checks if the dropping node is before the node being dropped on
-            // if so, it will replace the position
-            // Otherwise it will pop after
-            // This is a human ui thing... If you are dragging a node up, you expect it to drop in after, not before
+            // Is the drop happening on the form builder?
+            if(el.id === this.wrapper.id){
+                let newEl = JSON.parse(JSON.stringify(current));
+                newEl.setAttribute('id', (parseInt(newEl.id) + 1).toString() );
+                this.wrapper.appendChild(newEl);
+            }
+
+            /**
+             * This checks if the dropping node is before the node being dropped on
+             * if so, it will replace the position
+             * Otherwise it will pop after
+             * This is a human ui thing... If you are dragging a node up, you expect it to drop in after, not before
+             */
             if(current.compareDocumentPosition(el) === 2){
                 this.list.insertBefore(current, el);
             }else{
                 this.list.insertBefore(current, el.nextSibling);
             }
-            console.log(el.innerHTML + ' Was dropped on. ' + current.innerHTML + " is being dropped" );
-
         }
         this.dragEl = 'no selection';
     }
