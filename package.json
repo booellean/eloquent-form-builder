@@ -32,6 +32,7 @@
   "homepage": "https://github.com/booellean/eloquent-form-builder#readme",
   "devDependencies": {
     "autoprefixer": "^9.7.3",
+    "bulma": "^0.8.0",
     "css-loader": "^3.2.1",
     "extract-loader": "^3.1.0",
     "file-loader": "^5.0.2",
