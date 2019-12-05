@@ -1,11 +1,13 @@
 import { defaultOptions } from './defaultOpts';
 const Styles = require('./styles.scss');
+const Bulma = require('./../node_modules/bulma/css/bulma.min.css');
 
 export class FormBuilder {
     private base: HTMLElement;
     private wrapper: HTMLElement;
     private list: HTMLElement;
     private dragEl: string;
+    private dragDat: object;
     protected formData: Array<object>;
 
     constructor(element: string, options: Array<object> = defaultOptions){
@@ -16,6 +18,7 @@ export class FormBuilder {
         this.wrapper = document.createElement('ul');
         this.formData = [];
         this.dragEl = 'no selection';
+        this.dragDat = {};
 
         this.wrapper.id = 'form-build';
 
@@ -26,22 +29,16 @@ export class FormBuilder {
             const li = document.createElement('li');
             li.innerHTML = item.name;
             li.id = index.toString();
-            li.setAttribute('draggable', 'true');
 
             // Add event listeners for list item... creates drag and drop functionality and creating new form block
             li.addEventListener('click', () => this.createNewFormElement(item));
 
-            li.addEventListener('dragstart', (e: DragEvent) => this.onDragStart(li, item, e), false);
-            li.addEventListener('dragenter', (e: DragEvent) => this.onDragEnter(li, item, e), false);
-            li.addEventListener('dragover', (e: DragEvent) => this.onDragOver(li, item, e), false);
-            li.addEventListener('dragleave', (e: DragEvent) => this.onDragLeave(li, item, e), false);
-            li.addEventListener('drop', (e: DragEvent) => this.onDrop(li, item, e), false);
-            li.addEventListener('dragend', (e: DragEvent) => this.onDragEnd(li, item, e), false);
+            this.attachDragEvents(li, item, this.list);
             this.list.append(li);
         });
 
-        this.wrapper.addEventListener('dragover', (e: DragEvent) => this.onDragOver(this.wrapper, {}, e), false);
-        this.wrapper.addEventListener('drop', (e: DragEvent) => this.onDrop(this.wrapper, {}, e), false);
+        this.wrapper.addEventListener('dragover', (e: DragEvent) => this.onDragOver(this.wrapper, e), false);
+        this.wrapper.addEventListener('drop', (e: DragEvent) => this.onDrop(this.wrapper, this.wrapper, e), false);
 
         this.base.append(this.list);
         this.base.append(this.wrapper);
@@ -60,9 +57,17 @@ export class FormBuilder {
         const plug = await import(`./components/${name}`);
         const constructorName = Object.keys(plug)[0];
 
-        const newInstance = new plug[constructorName](item);
+        return new plug[constructorName](item);
+    }
 
-        console.log(newInstance);
+    attachDragEvents(li:HTMLElement, item: object, list: HTMLElement){
+        li.setAttribute('draggable', 'true');
+        li.addEventListener('dragstart', (e: DragEvent) => this.onDragStart(li, item, e), false);
+        li.addEventListener('dragenter', (e: DragEvent) => this.onDragEnter(li, e), false);
+        li.addEventListener('dragover', (e: DragEvent) => this.onDragOver(li, e), false);
+        li.addEventListener('dragleave', (e: DragEvent) => this.onDragLeave(li, e), false);
+        li.addEventListener('drop', (e: DragEvent) => this.onDrop(li, list, e), false);
+        li.addEventListener('dragend', (e: DragEvent) => this.onDragEnd(li, e), false);
     }
 
     // Drag and Drop Events
@@ -73,38 +78,42 @@ export class FormBuilder {
      */
 
     onDragStart(el: HTMLElement, data: object, e: DragEvent){
-        const t = e.dataTransfer;
-        this.dragEl = el.id;
-        el.classList.add('drag-moving'); // muted colors, this is moving
-        if(t){
-            t.effectAllowed = 'move';
-            t.setData('text/html', el.innerHTML);
+        if (e.stopPropagation){
+            e.stopPropagation();
         }
+        this.dragEl = el.id;
+        this.dragDat = data;
+        el.classList.add('drag-moving'); // muted colors, this is moving
     }
 
-    onDragEnter(el: HTMLElement, data: object, e: DragEvent){
+    onDragEnter(el: HTMLElement, e: DragEvent){
+        if (e.stopPropagation){
+            e.stopPropagation();
+        }
         el.classList.add('drag-hover'); // highlighted colors. This may be moved
         e.preventDefault();
     }
 
-    onDragOver(el: HTMLElement, data: object, e: DragEvent){
-        const t = e.dataTransfer;
+    onDragOver(el: HTMLElement, e: DragEvent){
         e.preventDefault();
         if (e.stopPropagation){
             e.stopPropagation();
         }
-        if(t){
-            t.dropEffect = 'move';
-            return false;
-        }
+        // TODO: Add a hovering class name?
     }
 
-    onDragLeave(el: HTMLElement, data: object, e: DragEvent){
+    onDragLeave(el: HTMLElement, e: DragEvent){
+        if (e.stopPropagation){
+            e.stopPropagation();
+        }
         el.classList.remove('drag-hover');
     }
 
-    onDrop(el: HTMLElement, data: object, e: DragEvent){
-        const t = e.dataTransfer;
+    async onDrop(el: HTMLElement, list: HTMLElement, e: DragEvent){
+        if (e.stopPropagation){
+            e.stopPropagation();
+        }
+
         console.log(el);
         let current = document.getElementById(this.dragEl);
         if (e.stopPropagation){
@@ -112,10 +121,27 @@ export class FormBuilder {
         }
         if(current){
             // Is the drop happening on the form builder?
-            if(el.id === this.wrapper.id){
-                let newEl = JSON.parse(JSON.stringify(current));
-                newEl.setAttribute('id', (parseInt(newEl.id) + 1).toString() );
-                this.wrapper.appendChild(newEl);
+            if(el.id === list.id){
+                // TODO: Instantiate the class from here
+                // let newEl: HTMLElement = current.cloneNode(true);
+                // newEl.setAttribute('id', (Math.floor(Math.random()*100000)).toString());
+                const elementObj = await this.createNewFormElement(this.dragDat);
+                const newEl = elementObj.formElementData;
+                // This allows for nodes to be delted when the x button is clicked.
+                // TODO: add obj data to master here,
+                elementObj.emitter.on('deletenode', () =>{
+                    console.log(elementObj);
+                    this.wrapper.removeChild(newEl);
+                })
+                // TODO: This is not working as expected? They will not realign
+                this.attachDragEvents(newEl, {}, list);
+                return this.wrapper.appendChild(newEl);
+            }
+
+            // If the current list item is from another list, DO NOT append...
+            // TODO: What behaviors should take place? Remove the nodes?
+            if(el.parentNode !== current.parentNode){
+                return;
             }
 
             /**
@@ -125,16 +151,22 @@ export class FormBuilder {
              * This is a human ui thing... If you are dragging a node up, you expect it to drop in after, not before
              */
             if(current.compareDocumentPosition(el) === 2){
-                this.list.insertBefore(current, el);
+                list.insertBefore(current, el);
             }else{
-                this.list.insertBefore(current, el.nextSibling);
+                list.insertBefore(current, el.nextSibling);
             }
         }
         this.dragEl = 'no selection';
+        this.dragDat = {};
     }
 
-    onDragEnd(el: HTMLElement, data: object, e: DragEvent){
+    onDragEnd(el: HTMLElement, e: DragEvent){
+        if (e.stopPropagation){
+            e.stopPropagation();
+        }
         el.classList.remove('drag-moving');
+        this.dragEl = 'no selection';
+        this.dragDat = {};
     }
 
     // Add field
@@ -145,6 +177,6 @@ export class FormBuilder {
 
     // Define BaseModel for all form inputs
 
-
+    // This renders the form data in a way for Laravel's Eloquent Form's Model to read. Please make edits for your specific Project's Purposes
 
 }

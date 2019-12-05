@@ -13,5 +13,41 @@
     #form-build{
         width: 100%;
         background: salmon;
+        li{
+            width: 100%;
+            display: block;
+            .button-holder{
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-end;
+                height: auto;
+                width: auto;
+                float: right;
+            }
+            .editable-content{
+                background: grey;
+                max-height: 0%;
+                overflow: hidden;
+                transition: max-height .2s linear;
+                div{
+                    width: 100%;
+                }
+            }
+            .editable-content.open{
+                max-height: 100%;
+            }
+        }
     }
+}
+
+.editbutton::after {
+    content: '\270E';
+    font-weight: bold;
+    transform: rotate(90deg);
+}
+
+.closebutton::after {
+    content: '\0072';
+    font-weight: bold;
+    font-family: Webdings;
 }
