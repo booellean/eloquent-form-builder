@@ -1,6 +1,5 @@
 import { defaultOptions } from './defaultOpts';
 const Styles = require('./styles.scss');
-const Bulma = require('./../node_modules/bulma/css/bulma.min.css');
 
 export class FormBuilder {
     private base: HTMLElement;
@@ -28,6 +27,7 @@ export class FormBuilder {
         defaultOptions.forEach( (item, index) => {
             const li = document.createElement('li');
             li.innerHTML = item.name;
+            li.className = 'form-option';
             li.id = index.toString();
 
             // Add event listeners for list item... creates drag and drop functionality and creating new form block
@@ -102,7 +102,6 @@ export class FormBuilder {
             dragImg.style.position = "fixed";
             dragImg.style.bottom = "-1000px";
             dragImg.style.left = "-1000px";
-            dragImg.style.display = 'block';
             dragImg.style.width = `${el.clientWidth}px`;
             dragImg.style.height = `${el.clientHeight}px`;
             document.body.appendChild(dragImg);

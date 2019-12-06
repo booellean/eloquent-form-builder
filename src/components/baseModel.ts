@@ -10,18 +10,22 @@ export default class base{
     // The entire HTML object, the form element and edits box
     protected platform: HTMLElement = document.createElement('li');
 
-    // private data: {[key: string]: any} = {};
     // TODO: Stretch, tooltip data to answer FAQ, such as What is a placeholder vs value?
+    /**
+     * Default properties: These are outlined in all the classes and will create fields to edit your added form element
+     * Any Where where you would like to add changes, note that this is the place to start. It is structured to make it easy
+     * to both add properties and change them. Dont' forget to change this.setDataObject() as well!
+     */
     public props: Array<any> = [
-        { property: 'label', name: 'Label', attr: 'label', value: '' },
-        { property: 'placeholder', name: 'Placeholder', attr: 'placeholder', value: '' },
-        { property: 'value', name: 'Value', attr: 'value', value: '' },
-        { property: 'required', name: 'Placeholder', attr: 'required', value: false },
+        { property: 'label', name: 'Label', attr: 'label', value: '', editOptionFunc: 'editOptionTextInput' },
+        { property: 'placeholder', name: 'Placeholder', attr: 'placeholder', value: '', editOptionFunc: 'editOptionTextInput' },
+        { property: 'value', name: 'Value', attr: 'value', value: '', editOptionFunc: 'editOptionTextInput' },
+        { property: 'required', name: 'Placeholder', attr: 'required', value: false, editOptionFunc: 'editOptionTextInput' },
     ]
+    // This is the data object. It will be instantiated from the Array above in this.setDataObject()
     public data: {[key: string]: any} = {}
 
-    protected formElClasses: Array<string> = ['type-text', 'field'];
-    // protected formElClasses: Array<string> = ['type-select', 'field'];
+
 
     private editOpen: boolean = false;
 
@@ -40,6 +44,7 @@ export default class base{
         const preview: HTMLElement = document.createElement('div');
         this.edits = document.createElement('section');
         this.edits.className = 'editable-content';
+        this.edits.style.height = '0px';
 
         const closeButton: HTMLElement = document.createElement('span');
         const editButton: HTMLElement = document.createElement('span');
@@ -62,6 +67,7 @@ export default class base{
         editButton.addEventListener('click', () => {
             this.editOpen = !this.editOpen;
             this.editOpen ? this.edits.classList.add('open') : this.edits.classList.remove('open');
+            this.editOpen ? this.edits.style.height = `${this.edits.scrollHeight}px` : this.edits.style.height = '0';
         });
 
         buttonHolder.className = 'button-holder';
@@ -75,8 +81,6 @@ export default class base{
         this.formEl.setAttribute('value', '');
         this.formEl.disabled = true;
 
-        const classes: string = this.formElClasses.join(' ');
-
         this.label.setAttribute('for', this.formEl.id);
         // TODO: Put this code in options later
         this.label.innerHTML = el.name;
@@ -86,7 +90,7 @@ export default class base{
         preview.appendChild(this.label);
         preview.appendChild(this.formEl);
         // TODO: figure out the classes for the different form elements
-        preview.className = classes;
+        // preview.className = classes;
 
         this.platform.id = `li-${this.formEl.id}`;
         // Be carefule if you change this class. It will affect how the cloned drag image works later
@@ -120,9 +124,6 @@ export default class base{
                 name : prop.name,
                 boundEl : isLabel ? this.label : this.formEl,
                 boundAttr : prop.attr,
-                editOption : (self: any) =>{
-                    return this.editOptionTextInput(self);
-                },
                 get data(){
                     return this.value;
                 },
@@ -136,7 +137,8 @@ export default class base{
                 }
             };
         }
-        let newEditField = this.data[prop.property].editOption(this.data[prop.property]);
+        // TODO: this line works, but Typescript is throwing error
+        let newEditField = this[prop.editOptionFunc](this.data[prop.property]);
         this.edits.appendChild(newEditField);
     }
 
@@ -150,18 +152,14 @@ export default class base{
      */
 
     protected editOptionTextInput(fieldDat: {[key: string]: any}): HTMLElement{
-        const classes: string = this.formElClasses.join(' ');
-
-        // Create the return div that all edit fields will be a part of
 
         let editDiv: HTMLElement = document.createElement('div');
-
-        editDiv.className = classes;
 
         let editLabelInput: HTMLInputElement = document.createElement('input');
         editLabelInput.type = 'text';
         editLabelInput.id = `${fieldDat.boundAttr}-${this.formEl.id}`;
         editLabelInput.value = fieldDat.value;
+        editLabelInput.className = 'input';
 
         let editLabel: HTMLElement = document.createElement('label');
         editLabel.innerHTML = fieldDat.name;
@@ -191,6 +189,7 @@ export default class base{
 
         observer.observe(fieldDat.boundEl, {
             attributes: true,
+            subtree: true,
             childList: true  // For changes to the Label's innerHTML
         })
 

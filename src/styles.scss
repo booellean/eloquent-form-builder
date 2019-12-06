@@ -1,10 +1,16 @@
 .form-wrapper{
+    *{
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    min-height: 800px;
     #form-options{
         width: 10em;
         flex-shrink: 0;
@@ -12,7 +18,14 @@
     }
     #form-build{
         width: 100%;
+        display: block;
+        box-sizing: border-box;
+        padding-bottom: 8em;
         background: salmon;
+        li{
+            box-sizing: border-box;
+            padding: 1em 1em 0 1em;
+        }
     }
 }
 
@@ -20,6 +33,7 @@
 li.form-item{
     width: 100%;
     display: block;
+    list-style: none;
     .button-holder{
         display: flex;
         flex-flow: row nowrap;
@@ -30,22 +44,21 @@ li.form-item{
     }
     .editable-content{
         background: grey;
-        max-height: 0%;
         overflow: hidden;
-        transition: max-height .2s linear;
+        transition: height .2s linear;
         div{
             width: 100%;
         }
     }
-    .editable-content.open{
-        max-height: 100%;
-    }
+    // .editable-content.open{
+    //     max-height: 100%;
+    // }
 }
 
 //Styles for the listed options. MUST BE OUTSIDE to work for cloned drag images
 
 li.form-option{
-
+    list-style: none;
 }
 
 .editbutton::after {
