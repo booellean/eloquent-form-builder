@@ -11,6 +11,7 @@ export default class input extends base{
 
         this.props.push({ property: 'minlength', name: 'Minumum Length', attr: 'minlength', value: 15 },);
 
+        // TODO: Always do the call here????
         this.props.forEach( prop =>{
             this.setDataObject(prop);
         })

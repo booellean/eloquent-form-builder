@@ -78,7 +78,6 @@ export class FormBuilder {
      */
 
     onDragStart(el: HTMLElement, data: object, e: DragEvent){
-        console.log(e);
         const t = e.dataTransfer;
         if (e.stopPropagation){
             e.stopPropagation();
@@ -86,15 +85,15 @@ export class FormBuilder {
         this.dragEl = el.id;
         this.dragDat = data;
         el.classList.add('drag-moving'); // muted colors, this is moving
+
+        //Create a custom image and override the default!
         if(t){
             let previous = document.getElementById('drag-placeholder');
             if(previous){
                 //Remove any previous placeholders hanging out in space
                 document.body.removeChild(previous);
             }
-            // This still doesn't work... Need a better strategy
-            t.effectAllowed = 'move';
-            t.setData('text/html', el.innerHTML);
+
             const dragImg: HTMLElement = document.createElement('li');
             dragImg.id = 'drag-placeholder';
             dragImg.innerHTML = el.innerHTML;
@@ -107,8 +106,7 @@ export class FormBuilder {
             dragImg.style.width = `${el.clientWidth}px`;
             dragImg.style.height = `${el.clientHeight}px`;
             document.body.appendChild(dragImg);
-            t.setDragImage(dragImg, 0, 0);
-            console.log(dragImg);
+            t.setDragImage(dragImg, e.offsetX, e.offsetY);
         }
     }
 
