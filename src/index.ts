@@ -78,12 +78,38 @@ export class FormBuilder {
      */
 
     onDragStart(el: HTMLElement, data: object, e: DragEvent){
+        console.log(e);
+        const t = e.dataTransfer;
         if (e.stopPropagation){
             e.stopPropagation();
         }
         this.dragEl = el.id;
         this.dragDat = data;
         el.classList.add('drag-moving'); // muted colors, this is moving
+        if(t){
+            let previous = document.getElementById('drag-placeholder');
+            if(previous){
+                //Remove any previous placeholders hanging out in space
+                document.body.removeChild(previous);
+            }
+            // This still doesn't work... Need a better strategy
+            t.effectAllowed = 'move';
+            t.setData('text/html', el.innerHTML);
+            const dragImg: HTMLElement = document.createElement('li');
+            dragImg.id = 'drag-placeholder';
+            dragImg.innerHTML = el.innerHTML;
+            dragImg.className = el.className;
+            // Need these custom stylings to prevent drag image issues
+            dragImg.style.position = "fixed";
+            dragImg.style.bottom = "-1000px";
+            dragImg.style.left = "-1000px";
+            dragImg.style.display = 'block';
+            dragImg.style.width = `${el.clientWidth}px`;
+            dragImg.style.height = `${el.clientHeight}px`;
+            document.body.appendChild(dragImg);
+            t.setDragImage(dragImg, 0, 0);
+            console.log(dragImg);
+        }
     }
 
     onDragEnter(el: HTMLElement, e: DragEvent){
@@ -113,18 +139,13 @@ export class FormBuilder {
         if (e.stopPropagation){
             e.stopPropagation();
         }
-
-        console.log(el);
         let current = document.getElementById(this.dragEl);
         if (e.stopPropagation){
             e.stopPropagation();
         }
         if(current){
             // Is the drop happening on the form builder?
-            if(el.id === list.id){
-                // TODO: Instantiate the class from here
-                // let newEl: HTMLElement = current.cloneNode(true);
-                // newEl.setAttribute('id', (Math.floor(Math.random()*100000)).toString());
+            if(el.id === list.id && Object.entries(this.dragDat).length !== 0){
                 const elementObj = await this.createNewFormElement(this.dragDat);
                 const newEl = elementObj.formElementData;
                 // This allows for nodes to be delted when the x button is clicked.

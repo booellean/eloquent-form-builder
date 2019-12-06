@@ -89,6 +89,8 @@ export default class base{
         preview.className = classes;
 
         this.platform.id = `li-${this.formEl.id}`;
+        // Be carefule if you change this class. It will affect how the cloned drag image works later
+        this.platform.classList.add('form-item');
         this.platform.appendChild(preview);
         this.platform.appendChild(this.edits);
     }

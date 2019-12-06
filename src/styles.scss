@@ -13,31 +13,39 @@
     #form-build{
         width: 100%;
         background: salmon;
-        li{
+    }
+}
+
+// Styles for the form item.  MUST BE OUTSIDE to work for cloned drag images
+li.form-item{
+    width: 100%;
+    display: block;
+    .button-holder{
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
+        height: auto;
+        width: auto;
+        float: right;
+    }
+    .editable-content{
+        background: grey;
+        max-height: 0%;
+        overflow: hidden;
+        transition: max-height .2s linear;
+        div{
             width: 100%;
-            display: block;
-            .button-holder{
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: flex-end;
-                height: auto;
-                width: auto;
-                float: right;
-            }
-            .editable-content{
-                background: grey;
-                max-height: 0%;
-                overflow: hidden;
-                transition: max-height .2s linear;
-                div{
-                    width: 100%;
-                }
-            }
-            .editable-content.open{
-                max-height: 100%;
-            }
         }
     }
+    .editable-content.open{
+        max-height: 100%;
+    }
+}
+
+//Styles for the listed options. MUST BE OUTSIDE to work for cloned drag images
+
+li.form-option{
+
 }
 
 .editbutton::after {
