@@ -26,7 +26,7 @@ module.exports = {
                 transpileOnly: true
             }
         },
-        exclude: /node_modules/,
+        exclude: ['/node_modules/', '/test/'],
       },
       {
         test: /\.s?css$/,
