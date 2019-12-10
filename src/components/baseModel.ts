@@ -1,7 +1,12 @@
 import { EventEmitter } from "events";
 
-export default class base{
+export default class base implements CustomObj{
     //default element properties
+
+    // This is necessary for implementation of calling a function by index in the setDataObject() function,
+    //let newEditField = this[prop.editOptionFunc](this.data[prop.property]);
+    [key: string]: any
+
 
     protected label: HTMLElement = document.createElement('label');
     protected formEl: HTMLFormElement;
@@ -23,16 +28,14 @@ export default class base{
         { property: 'required', name: 'Placeholder', attr: 'required', value: false, editOptionFunc: 'editOptionTextInput' },
     ]
     // This is the data object. It will be instantiated from the Array above in this.setDataObject()
-    public data: {[key: string]: any} = {}
-
-
+    public data: CustomObj = {}
 
     private editOpen: boolean = false;
 
     // Emit event for delete call
     public emitter:EventEmitter = new EventEmitter();
 
-    constructor(el: {[key: string]: any}){
+    constructor(el: CustomObj){
 
         if(el.options){
             // TODO: checks for default values included in the element passed
@@ -105,7 +108,7 @@ export default class base{
     }
 
     // TODO: Return formatted json for Eloquent forms
-    get elementData(): {[key: string]: any}{
+    get elementData(): CustomObj{
         return { key : 'value'};
     }
 
@@ -115,7 +118,7 @@ export default class base{
     }
 
     // Formatting methods
-    setDataObject(prop: {[key: string]: any}){
+    setDataObject(prop: CustomObj){
         if(!this.data[prop.property]){
             const isLabel = prop.property === 'label' ? true : false;
             this.data[prop.property] = {
@@ -137,7 +140,7 @@ export default class base{
                 }
             };
         }
-        // TODO: this line works, but Typescript is throwing error
+
         let newEditField = this[prop.editOptionFunc](this.data[prop.property]);
         this.edits.appendChild(newEditField);
     }
@@ -151,7 +154,7 @@ export default class base{
      * Event listeners and Mutation Observers are here to watch for changes between the DOM objects and data object
      */
 
-    protected editOptionTextInput(fieldDat: {[key: string]: any}): HTMLElement{
+    protected editOptionTextInput(fieldDat: CustomObj): HTMLElement{
 
         let editDiv: HTMLElement = document.createElement('div');
 
