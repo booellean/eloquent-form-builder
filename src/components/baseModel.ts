@@ -15,7 +15,7 @@ export default class base implements CustomObj{
     // The entire HTML object, the form element and edits box
     protected platform: HTMLElement = document.createElement('li');
 
-    // TODO: Stretch, tooltip data to answer FAQ, such as What is a placeholder vs value?
+    // TODO: Stretch goal, tooltip data to answer FAQ, such as What is a placeholder vs value?
     /**
      * Default properties: These are outlined in all the classes and will create fields to edit your added form element
      * Any Where where you would like to add changes, note that this is the place to start. It is structured to make it easy
@@ -46,6 +46,7 @@ export default class base implements CustomObj{
         const buttonHolder: HTMLElement = document.createElement('div');
         const preview: HTMLElement = document.createElement('div');
         this.edits = document.createElement('section');
+        this.edits.appendChild(document.createElement('div'));
         this.edits.className = 'editable-content';
         this.edits.style.height = '0px';
 
@@ -123,7 +124,7 @@ export default class base implements CustomObj{
             const isLabel = prop.property === 'label' ? true : false;
             this.data[prop.property] = {
                 // value : isLabel ? 'Label' : el.options[prop].value || '', // Need to do nested checks!
-                value : isLabel ? 'Text' : '',
+                value : isLabel ? this.label.innerHTML : '',
                 name : prop.name,
                 boundEl : isLabel ? this.label : this.formEl,
                 boundAttr : prop.attr,
@@ -142,7 +143,7 @@ export default class base implements CustomObj{
         }
 
         let newEditField = this[prop.editOptionFunc](this.data[prop.property]);
-        this.edits.appendChild(newEditField);
+        if(this.edits.firstChild) this.edits.firstChild.appendChild(newEditField);
     }
 
     /**
