@@ -48,6 +48,10 @@ li.form-item{
         transition: height .2s linear;
         div{
             width: 100%;
+            padding: 2em;
+            div{
+                padding: 0;
+            }
         }
     }
     // .editable-content.open{
