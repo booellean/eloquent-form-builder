@@ -22,6 +22,7 @@ export class FormBuilder {
         }
 
         base.classList.add('form-wrapper');
+        base.innerHTML = '';
 
         this.wrapper.id = 'form-build';
         this.list.id = 'form-options';
@@ -31,6 +32,7 @@ export class FormBuilder {
             li.innerHTML = item.name;
             li.className = 'form-option';
             li.id = index.toString();
+            li.setAttribute('data-name', item.type);
 
             // Add event listeners for list item... creates drag and drop functionality and creating new form block
             li.addEventListener('click', () => this.createNewFormElement(item));
@@ -60,9 +62,7 @@ export class FormBuilder {
         // For es5+ query the first key
         // const constructorName = Object.keys(plug)[0];
 
-        console.log(plug);
-
-        // return new input(item);
+        // I.E. return new input(item);
         return new plug[constructorName](item);
     }
 
@@ -92,7 +92,7 @@ export class FormBuilder {
         }
         this.dragEl = el.id;
         this.dragDat = data;
-        el.classList.add('drag-moving'); // muted colors, this is moving
+        el.classList.add('drag-moving'); // NOTE: muted colors, this is moving
 
         //Create a custom image and override the default!
         if(t){
@@ -161,7 +161,7 @@ export class FormBuilder {
             if(el.id === list.id && Object.keys(this.dragDat).length !== 0){
                 const elementObj = this.createNewFormElement(this.dragDat);
                 const newEl = elementObj.formElementData;
-                // This allows for nodes to be delted when the x button is clicked.
+                // This allows for nodes to be deleted when the x button is clicked.
                 // TODO: add obj data to master here,
                 elementObj.emitter.on('deletenode', () =>{
                     console.log(elementObj);
