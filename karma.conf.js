@@ -21,16 +21,23 @@ module.exports = (config) => {
       'karma-spec-reporter'
     ],
     karmaTypescriptConfig: {
+      compilerOptions: {
+        module: "commonjs",
+        sourceMap: true,
+      },
       tsconfig: "./tsconfig.json",
     },
     client: {
       // leave Jasmine Spec Runner output visible in browser
       clearContext: false
     },
-    files: [ { pattern: 'src/**/*.ts' }, { pattern: 'tests/**/*.spec.ts' } ],
+    files: [
+        { pattern: 'src/**/*.ts', included: true },
+        { pattern: 'tests/**/*.spec.ts', included: true },
+    ],
     preprocessors: {
       'src/**/*.ts': [ 'karma-typescript' ],
-      'tests/**/*.spec.ts': [ 'karma-typescript' ]
+      'tests/**/*.spec.ts': [ 'karma-typescript' ],
     },
     reporters: [ 'spec', 'karma-typescript' ],
     colors: true,

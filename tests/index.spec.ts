@@ -1,5 +1,7 @@
 import { FormBuilder } from './../src/index';
 import { defaultOptions } from './../src/defaultOpts';
+//  require('./../src/components/input');
+//  require('./../src/components/baseModel');
 
 describe('#formBuilder', () =>{
     const idName = 'test';
@@ -10,6 +12,9 @@ describe('#formBuilder', () =>{
 
         document.body.insertAdjacentHTML('afterbegin', testDiv);
         testBuilder = new FormBuilder(idName);
+        //  require('./../src/components/input');
+        //  require('./../src/components/baseModel');
+        // testBuilder.path = './../src/components/';
     });
 
     afterEach(() => {

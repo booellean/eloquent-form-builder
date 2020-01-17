@@ -1,6 +1,11 @@
 import { defaultOptions } from './defaultOpts';
 // import * as Polyfill from './polyfill.js';
 const Styles = require('./styles.scss');
+// import input from './components/input';
+
+const elements : CustomObj = {
+    'input' : require('./components/input')
+}
 
 export class FormBuilder {
     // private base: HTMLElement;
@@ -9,6 +14,7 @@ export class FormBuilder {
     private dragEl: string = 'no selection';
     private dragDat: object = {};
     protected formData: Array<object> = [];
+    private path: string = './components/';
 
     constructor(element: string, options: Array<object> = defaultOptions){
         // Inject polyfills into head
@@ -55,15 +61,13 @@ export class FormBuilder {
         let name = item.type;
 
         // NOTE: The class names are going to coincide with the item.type, so BE CAUTIOUS WHEN CHANGING CLASS NAMES OR TYPES
-        // Once imported, a new instance can be instantiated
 
-        const plug = require(`./components/${name}`);
-        const constructorName = 'default';
-        // For es5+ query the first key
-        // const constructorName = Object.keys(plug)[0];
+        // All Usable form elements are loaded at start of application in the 'elements' object
+        // These can be used to insantiate new objects from the classes using the constructor
+        // The constructor resides in the "default" key, hence the nested object we see below
+        // NOTE: I would not mess with this code personally, try to make all needed changes between the class constructors themselves
 
-        // I.E. return new input(item);
-        return new plug[constructorName](item);
+        return new elements[name]['default'](item);
     }
 
     attachDragEvents(li:HTMLElement, item: object, list: HTMLElement){
@@ -167,7 +171,6 @@ export class FormBuilder {
                     console.log(elementObj);
                     this.wrapper.removeChild(newEl);
                 })
-                // TODO: This is not working as expected? They will not realign
                 this.attachDragEvents(newEl, {}, list);
                 return this.wrapper.appendChild(newEl);
             }
