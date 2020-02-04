@@ -15,7 +15,13 @@
             <section id="test"></section>
         </main>
         <script>
-            var test = new ef.FormBuilder("test");
+            var test = new ef.FormBuilder("test", {
+                options: [
+                    { type: 'input', subtype : 'text', name: 'Text'},
+                    { type: 'input', subtype : 'email', name: 'Email'},
+                    { type: 'input', subtype : 'number', name: 'Number'},
+                ]
+            });
         </script>
     </body>
 </html>

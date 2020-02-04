@@ -1,6 +1,6 @@
-import { defaultOptions } from './defaultOpts';
+import { defaults } from './defaults';
 // import * as Polyfill from './polyfill.js';
-const Styles = require('./styles.scss');
+require('./styles.scss');
 // import input from './components/input';
 
 const elements : CustomObj = {
@@ -9,21 +9,30 @@ const elements : CustomObj = {
 
 export class FormBuilder {
     // private base: HTMLElement;
-    private wrapper: HTMLElement = document.createElement('ul');
+    private wrapper: HTMLUListElement = document.createElement('ul');
     private list: HTMLElement = document.createElement('ul');
     private dragEl: string = 'no selection';
     private dragDat: object = {};
-    protected formData: Array<object> = [];
-    private path: string = './components/';
+    protected formData: Array<CustomObj> = [];
 
-    constructor(element: string, options: Array<object> = defaultOptions){
-        // Inject polyfills into head
+    constructor(element: string, extend: CustomObj = {}){
+        // TODO: Inject polyfills into head
 
         const base = document.getElementById(element);
+
+        // The following below will override default values with the options a user passes in
+        // This is the easiest way to gaurantee options while allowing overrides, similar to Froala instantiation pattern
+        Object.keys(extend).forEach( key =>{
+            Object.defineProperty(defaults, key, {
+                value: extend[key],
+                writable: true
+            })
+        })
 
         // If there is no base, return and end all operations
         if(!base){
             this.dragEl = 'Exit Function';
+            console.log("Check the id of the element you passed!");
             return;
         }
 
@@ -33,7 +42,7 @@ export class FormBuilder {
         this.wrapper.id = 'form-build';
         this.list.id = 'form-options';
 
-        defaultOptions.forEach( (item, index) => {
+        defaults.options.forEach( (item: any, index: any) => {
             const li = document.createElement('li');
             li.innerHTML = item.name;
             li.className = 'form-option';
@@ -49,6 +58,30 @@ export class FormBuilder {
 
         this.wrapper.addEventListener('dragover', (e: DragEvent) => this.onDragOver(this.wrapper, e), false);
         this.wrapper.addEventListener('drop', (e: DragEvent) => this.onDrop(this.wrapper, this.wrapper, e), false);
+
+        // Attach a Mutation Observer to observe changes of Form element order form user
+        const observer = new MutationObserver( (mutations) =>{
+            mutations.forEach( mutation =>{
+                /**
+                 * NOTE: Every time the ul wrapper has elements added, deleted, or moved, the array is resorted.
+                 * It relies on finding the index of the childnodes, which will match our platform property in our objects
+                 * It's a little confusing, but this is a quick, one stop shop for guaranteeing the array order will always match the order in the UI
+                 */
+
+                this.formData.sort( (a: CustomObj, b: CustomObj) =>{
+                    if(Array.prototype.slice.call(this.wrapper.childNodes).indexOf(a.platform) > Array.prototype.slice.call(this.wrapper.childNodes).indexOf(b.platform)){
+                        return 1;
+                    }else{
+                        return -1;
+                    };
+                })
+            })
+        })
+
+        observer.observe(this.wrapper, {
+            subtree: true,
+            childList: true  // For changes to the Label's innerHTML
+        })
 
         base.appendChild(this.list);
         base.appendChild(this.wrapper);
@@ -78,6 +111,10 @@ export class FormBuilder {
         li.addEventListener('dragleave', (e: DragEvent) => this.onDragLeave(li, e), false);
         li.addEventListener('drop', (e: DragEvent) => this.onDrop(li, list, e), false);
         li.addEventListener('dragend', (e: DragEvent) => this.onDragEnd(li, e), false);
+    }
+
+    attachObjectWatchers(){
+
     }
 
     /**
@@ -165,14 +202,18 @@ export class FormBuilder {
             if(el.id === list.id && Object.keys(this.dragDat).length !== 0){
                 const elementObj = this.createNewFormElement(this.dragDat);
                 const newEl = elementObj.formElementData;
+
                 // This allows for nodes to be deleted when the x button is clicked.
                 // TODO: add obj data to master here,
+                this.formData.push( elementObj );
                 elementObj.emitter.on('deletenode', () =>{
-                    console.log(elementObj);
+                    // NOTE: If you use the index method, Two nodes will be deleted due to the reordering function
+                    this.formData = this.formData.filter( (item) =>  item.platform !== elementObj.platform );
                     this.wrapper.removeChild(newEl);
                 })
                 this.attachDragEvents(newEl, {}, list);
-                return this.wrapper.appendChild(newEl);
+                this.wrapper.appendChild(newEl);
+                return;
             }
 
             // If the current list item is from another list, DO NOT append...

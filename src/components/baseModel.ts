@@ -25,10 +25,10 @@ export default class base implements CustomObj{
         { property: 'label', name: 'Label', attr: 'label', value: '', editOptionFunc: 'editOptionTextInput' },
         { property: 'placeholder', name: 'Placeholder', attr: 'placeholder', value: '', editOptionFunc: 'editOptionTextInput' },
         { property: 'value', name: 'Value', attr: 'value', value: '', editOptionFunc: 'editOptionTextInput' },
-        { property: 'required', name: 'Placeholder', attr: 'required', value: false, editOptionFunc: 'editOptionTextInput' },
+        { property: 'required', name: 'Required', attr: 'required', value: false, editOptionFunc: 'editOptionTextInput' },
     ]
     // This is the data object. It will be instantiated from the Array above in this.setDataObject()
-    public data: CustomObj = {}
+    protected data: CustomObj = {}
 
     private editOpen: boolean = false;
 
@@ -108,14 +108,18 @@ export default class base implements CustomObj{
         return this.platform;
     }
 
-    // TODO: Return formatted json for Eloquent forms
-    get elementData(): CustomObj{
-        return { key : 'value'};
-    }
-
     set formElementData(el: HTMLElement) {
         // TODO: Do I really need this setter? Maybe overkill
         this.platform = el;
+    }
+
+    // TODO: Return formatted json for Eloquent forms
+    get elementData(): CustomObj{
+        return this.data;
+    }
+
+    set elementData(data: CustomObj){
+        this.data = data;
     }
 
     // Formatting methods
